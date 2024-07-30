@@ -40,8 +40,8 @@ class QueueTest extends TestCase
         $key1 = $queue->setMessage($message1);
         $key2 = $queue->setMessage($message2);
 
-        $this->assertNotEquals($f_msg1 = $queue->getMessage($key1),$f_msg_2 = $queue->getMessage($key2));
-        $this->assertEquals($f_msg1->getData(),$message1->getData());
+        $this->assertNotEquals($f_msg1 = $queue->getMessage($key1), $f_msg_2 = $queue->getMessage($key2));
+        $this->assertEquals($f_msg1->getData(), $message1->getData());
         $queue->deleteAll();
     }
 
@@ -50,14 +50,17 @@ class QueueTest extends TestCase
         $queue = new Queue();
         $message_limit = 100;
         for ($i = 0; $i < $message_limit; $i++) {
-            $message = new QueueMessage(['message' => "message-$i"]);
+            $message = new QueueMessageCustom(['data' => "message-$i"]);
             $queue->setMessage($message);
         }
 
         while (($message = $queue->fetch()) && $message_limit--) {
-            if ($message instanceof QueueMessage){
-                /** some work ... */
-                $queue->deleteMessage($message->getId());
+            if ($message instanceof QueueMessageCustom) {
+                $message->work();
+            }
+
+            if ($message instanceof QueueMessage) {
+                $this->assertTrue($queue->deleteMessage($message->getId()));
             }
         }
         $this->assertNull($queue->fetch());
@@ -80,18 +83,26 @@ class QueueTest extends TestCase
         $message2 = new QueueMessage(['message' => 'testMessage2']);
         $queue->setMessage($message1);
         $queue->setMessage($message2);
-        $queue->deleteAll();  
+        $queue->deleteAll();
         $this->assertNull($queue->fetch());
     }
 }
 
 
-class QueueMessageCustom extends QueueMessage{
-    public function getData():string{
+class QueueMessageCustom extends QueueMessage
+{
+    public function getData(): string
+    {
         return $this->getAttribute('data');
     }
-    public function setData(string $data):self{
-        $this->setAttribute('data',$data);
+    public function setData(string $data): self
+    {
+        $this->setAttribute('data', $data);
         return $this;
+    }
+
+    public function work(): void
+    {
+        /** some action */
     }
 }
