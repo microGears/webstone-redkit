@@ -20,7 +20,7 @@ use WebStone\Stdlib\Classes\AutoInitialized;
  */
 abstract class ClientAbstract extends AutoInitialized implements ClientInterface
 {
-    protected IODriverInterface $driver;
+    protected ?IODriverInterface $driver = null;
     protected string $host = '127.0.0.1';
     protected int $lifetime = 60;
     protected int $port = 6379;

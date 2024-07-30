@@ -16,7 +16,7 @@ class Queue extends Client
 {
     protected string $node = 'queue';
 
-    public function deleteAll():int
+    public function deleteAll(): int
     {
         $node = $this->getNode();
 
@@ -44,7 +44,7 @@ class Queue extends Client
         return false;
     }
 
-    public function fetch($ttl = 60):mixed
+    public function fetch($ttl = 60): mixed
     {
         $result    = null;
         $node      = $this->getNode();
@@ -75,8 +75,10 @@ class Queue extends Client
     public function getMessage($key): mixed
     {
         $node = $this->getNode();
-
-        return unserialize(base64_decode($this->get("$node:value:$key")));
+        if ($this->exists("$node:value:$key")) {
+            return unserialize(base64_decode($this->get("$node:value:$key")));
+        }
+        return null;
     }
 
     public function getMessageCount(): int

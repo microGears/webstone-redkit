@@ -31,7 +31,7 @@ class Stream implements IODriverInterface
     {
         $this->server = $server;
         if (is_numeric($ttl)) {
-            $this->ttl = ceil($ttl * 1000000);
+            $this->ttl = (int)ceil($ttl * 1000000);
         }
     }
 
